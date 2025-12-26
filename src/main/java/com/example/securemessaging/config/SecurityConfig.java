@@ -15,46 +15,95 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 
-@EnableMethodSecurity
+//@EnableMethodSecurity
+//@Configuration
+//public class SecurityConfig {
+//	@Autowired
+//	JwtAuthenticationFilter jwtAuthenticationFilter;
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+////        http
+////            // Disable CSRF for development (required for H2 console)
+////            .csrf(csrf -> csrf.disable())
+////
+////            // Authorization rules
+////            .authorizeHttpRequests(auth -> auth
+////                .requestMatchers("/h2-console/**", "/auth/register").permitAll()
+////                .anyRequest().authenticated()
+////            )
+////
+////            // Allow H2 console frames
+////            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+////
+////            // TEMPORARY basic authentication
+////            .httpBasic(Customizer.withDefaults());
+//    	http
+//        .csrf(csrf -> csrf.disable())
+//        .authorizeHttpRequests(auth -> auth
+//            .requestMatchers("/auth/register", "/auth/login", "/h2-console/**").permitAll()
+//            .anyRequest().authenticated()
+//        )
+//        .sessionManagement(session ->
+//            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        )
+//        .addFilterBefore(jwtAuthenticationFilter,
+//            UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+//        return configuration.getAuthenticationManager();
+//    }
+//
+//}
+//
+
+
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
-	@Autowired
-	JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-//        http
-//            // Disable CSRF for development (required for H2 console)
-//            .csrf(csrf -> csrf.disable())
-//
-//            // Authorization rules
-//            .authorizeHttpRequests(auth -> auth
-//                .requestMatchers("/h2-console/**", "/auth/register").permitAll()
-//                .anyRequest().authenticated()
-//            )
-//
-//            // Allow H2 console frames
-//            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-//
-//            // TEMPORARY basic authentication
-//            .httpBasic(Customizer.withDefaults());
-    	http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/register", "/auth/login", "/h2-console/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .sessionManagement(session ->
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-        .addFilterBefore(jwtAuthenticationFilter,
-            UsernamePasswordAuthenticationFilter.class);
+        http
+            .csrf(csrf -> csrf.disable())
+
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/auth/register",
+                    "/auth/login",
+                    "/h2-console/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+
+            // ✅ REQUIRED FOR H2 CONSOLE
+            .headers(headers ->
+                headers.frameOptions(frame -> frame.disable())
+            )
+
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         return http.build();
     }
+
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
 }
+

@@ -1,20 +1,50 @@
 package com.example.securemessaging.repository;
 
-import com.example.securemessaging.entity.Message;
-import com.example.securemessaging.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.example.securemessaging.entity.Conversation;
+import com.example.securemessaging.entity.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    // Inbox: messages received by user
-    List<Message> findByReceiver(User receiver);
+    // Full chat history
+    List<Message> findByConversationOrderByCreatedAtAsc(Conversation conversation);
+    
+    List<Message> findByConversationOrderByCreatedAtDesc(Conversation conversation);
 
-    // Outbox: messages sent by user
-    List<Message> findBySender(User sender);
+    
+//    We need to fetch last message per conversation.
+    @Query("""
+    		   SELECT m FROM Message m
+    		   WHERE m.conversation = :conversation
+    		   ORDER BY m.createdAt DESC
+    		""")
+    		List<Message> findLastMessage(Conversation conversation);
 
-    // Conversation between two users
-    List<Message> findBySenderAndReceiver(User sender, User receiver);
 }
 
+
+
+//package com.example.securemessaging.repository;
+//
+//import com.example.securemessaging.entity.Message;
+//import com.example.securemessaging.entity.User;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//
+//import java.util.List;
+//
+//public interface MessageRepository extends JpaRepository<Message, Long> {
+//
+//    // Inbox: messages received by user
+//    List<Message> findByReceiver(User receiver);
+//
+//    // Outbox: messages sent by user
+//    List<Message> findBySender(User sender);
+//
+//    // Conversation between two users
+//    List<Message> findBySenderAndReceiver(User sender, User receiver);
+//}
+//

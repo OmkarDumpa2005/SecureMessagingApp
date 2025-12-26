@@ -10,19 +10,32 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    
+    @ManyToOne
+    @JoinColumn(name = "conversation_id", nullable = false)
+    private Conversation conversation;
+    
     @ManyToOne(optional = false)
     @JoinColumn(name = "sender_id")
     private User sender;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
+//    @ManyToOne(optional = false)
+//    @JoinColumn(name = "receiver_id")
+//    private User receiver;
 
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @Enumerated(EnumType.STRING)
+    public Conversation getConversation() {
+		return conversation;
+	}
+
+	public void setConversation(Conversation conversation) {
+		this.conversation = conversation;
+	}
+
+	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MessageStatus status;
 
@@ -45,13 +58,13 @@ public class Message {
 		this.sender = sender;
 	}
 
-	public User getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(User receiver) {
-		this.receiver = receiver;
-	}
+//	public User getReceiver() {
+//		return receiver;
+//	}
+//
+//	public void setReceiver(User receiver) {
+//		this.receiver = receiver;
+//	}
 
 	public String getContent() {
 		return content;
